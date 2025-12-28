@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+       {% block content %}
+  
+
+        <h2 class="my-4">{{ category.category_name }}</h2>
+
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-12 mb-4">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <h3>{{ post.title }}</h3>
+                        <small class="mb-1 text-muted">{{ post.created_at|timesince }} ago | {{ post.author }}</small>
+                        <p class="card-text">{{ post.short_description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-12">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">No posts found!</h4>
+                    <p>There are currently no posts in the <strong>{{ category.category_name }}</strong> category.</p>
+                    <hr>
+                    <p class="mb-0">Check back later or explore other categories!</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'home' %}" class="btn btn-primary mb-4">← Back to Home</a>
+    </div>
+
+{% endblock %}
+    
