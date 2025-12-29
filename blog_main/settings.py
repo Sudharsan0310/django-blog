@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blogs',
+    'assignments',
 ]
 
 MIDDLEWARE = [
@@ -62,10 +63,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'blogs.context_processors.get_social_links',  # ✅ Only one "get"
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'blog_main.wsgi.application'
 
@@ -115,13 +118,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR /'static'
 STATICFILES_DIRS =[
     'blog_main/static',
 ]
 
-MEDIA_URL ='/media/'
-MEDIA_ROOT = BASE_DIR/ 'media'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
