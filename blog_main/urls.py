@@ -32,9 +32,14 @@ urlpatterns = [
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     
-    # Search BEFORE slug pattern!
-    path('search/', blog_views.search, name='search'),  # ✅ Moved here and simplified!
+    # Search
+    path('search/', blog_views.search, name='search'),
     
-    # Slug pattern LAST (it catches everything else)
+    # Authentication - BEFORE slug pattern!
+    path('register/', main_views.register, name='register'),
+    path('login/', main_views.user_login, name='login'),
+    path('logout/', main_views.user_logout, name='logout'),
+    
+    # Slug pattern LAST
     path('<slug:slug>/', blog_views.blogs, name='blogs'),
 ]

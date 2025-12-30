@@ -11,7 +11,7 @@
     <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
-  </head>
+</head>
 <body>
     <div class="container">
       <header class="blog-header py-3">
@@ -20,16 +20,21 @@
             <a class="blog-header-logo text-dark" href="/">Django Blog</a>
           </div>
           <div class="col-4">
-  <form action="{% url 'search' %}" method="GET">
-    <div class="input-group">
-      <input class="form-control" type="text" name="keyword" placeholder="Enter search term..." />
-      <button class="btn btn-warning" type="submit">Go!</button>
-    </div>
-  </form>
-</div>
+            <form action="{% url 'search' %}" method="GET">
+              <div class="input-group">
+                <input class="form-control" type="text" name="keyword" placeholder="Enter search term..." />
+                <button class="btn btn-warning" type="submit">Go!</button>
+              </div>
+            </form>
+          </div>
           <div class="col-4 d-flex justify-content-end align-items-center">
-            <a class="btn btn-sm btn-warning" href="#">Login</a> &nbsp;
-            <a class="btn btn-sm btn-outline-secondary" href="#">Sign Up</a>
+            {% if user.is_authenticated %}
+              <span class="mr-3 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
+              <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+            {% else %}
+              <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
+              <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+            {% endif %}
           </div>
         </div>
       </header>
@@ -42,15 +47,31 @@
         </nav>
       </div>
 
-<!--Main cotent part-->
+<!--Main content part-->
 {% block content %}
 
 {% endblock %}
+
 <!--footer path-->
 <footer class="blog-footer">
   <center>
-  <p>Django blog built with � by <a href="#">Sudharshan</a></p>
+    <p>Django blog built with ❤️ by <a href="#">Sudharshan</a></p>
   </center>
 </footer>
+</body>
+</html>
+
+<!-- Bootstrap JS (Required for close buttons) -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<!-- Auto-hide alerts after 3 seconds -->
+<script>
+  setTimeout(function() {
+    $('.alert').fadeOut('slow');
+  }, 3000);
+</script>
+
 </body>
 </html>
