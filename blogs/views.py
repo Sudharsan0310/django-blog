@@ -34,3 +34,10 @@ def search(request):
         'keyword': keyword,  # ✅ Add this!
     }
     return render(request, 'search.html', context)
+
+def categories_list(request):
+    categories = Category.objects.all()
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'categories_list.html', context)

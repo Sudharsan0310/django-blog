@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
@@ -34,11 +34,13 @@ urlpatterns = [
     
     # Search
     path('search/', blog_views.search, name='search'),
+    path('categories/', blog_views.categories_list, name='categories_list'),
     
     # Authentication - BEFORE slug pattern!
     path('register/', main_views.register, name='register'),
     path('login/', main_views.user_login, name='login'),
     path('logout/', main_views.user_logout, name='logout'),
+    path('dashboard/', include('dashboards.urls')),
     
     # Slug pattern LAST
     path('<slug:slug>/', blog_views.blogs, name='blogs'),

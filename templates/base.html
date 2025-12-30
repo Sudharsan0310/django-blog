@@ -11,13 +11,72 @@
     <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
+    
+    <style>
+        .active-link {
+            font-weight: bold;
+            color: #ffc107 !important;
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        /* Sidebar styling */
+        .sidebar .card {
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s;
+        }
+        
+        .sidebar .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar a {
+            color: #495057;
+            transition: color 0.2s;
+        }
+        
+        .sidebar a:hover {
+            color: #ffc107;
+            text-decoration: none;
+        }
+        
+        /* Category navigation */
+        .nav-scroller {
+            overflow-x: auto;
+        }
+        
+        .nav-scroller .nav {
+            flex-wrap: nowrap;
+        }
+        
+        .nav-scroller .nav a {
+            transition: all 0.3s;
+        }
+        
+        .nav-scroller .nav a:hover {
+            color: #ffc107 !important;
+            transform: scale(1.1);
+        }
+        
+        /* Badge styling */
+        .badge {
+            transition: all 0.3s;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
       <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
           <div class="col-4 pt-1">
-            <a class="blog-header-logo text-dark" href="/">Django Blog</a>
+            <a class="blog-header-logo text-dark" href="{% url 'home' %}">Django Blog</a>
           </div>
           <div class="col-4">
             <form action="{% url 'search' %}" method="GET">
@@ -28,38 +87,103 @@
             </form>
           </div>
           <div class="col-4 d-flex justify-content-end align-items-center">
-            {% if user.is_authenticated %}
-              <span class="mr-3 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
-              <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
-            {% else %}
-              <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
-              <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
-            {% endif %}
-          </div>
+    {% if user.is_authenticated %}
+      <a class="btn btn-sm btn-secondary mr-2" href="{% url 'categories_list' %}">Categories</a>
+      <a class="btn btn-sm btn-info mr-2" href="{% url 'dashboard' %}">Dashboard</a>
+      <span class="mr-2 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
+      <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a class="btn btn-sm btn-secondary mr-2" href="{% url 'categories_list' %}">Categories</a>
+      <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+    {% endif %}
+</div>
         </div>
       </header>
 
       <div class="nav-scroller py-1 mb-2">
-        <nav class="nav d-flex justify-content-between">
+        <nav class="nav d-flex flex-wrap justify-content-start">
           {% for cat in categories %}
-             <a class="p-2 text-muted" href="{% url 'posts_by_category' cat.id %}">{{ cat.category_name }}</a>
+             <a class="p-2 text-muted text-nowrap" href="{% url 'posts_by_category' cat.id %}" style="white-space: nowrap;">
+                 {{ cat.category_name }}
+             </a>
           {% endfor %}
         </nav>
       </div>
 
-<!--Main content part-->
-{% block content %}
+<!--Main content with optional sidebar-->
+{% block main_layout %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-md-9">
+        {% block content %}
+        {% endblock %}
+    </div>
 
+    <!-- Sidebar (Right side) -->
+    <div class="col-md-3">
+        <div class="sidebar">
+            
+            <!-- Categories Widget -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">📚 Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap">
+                        {% for cat in categories %}
+                        <a href="{% url 'posts_by_category' cat.id %}" 
+                           class="badge badge-info mr-2 mb-2 p-2 text-decoration-none" 
+                           style="font-size: 0.9rem;">
+                            {{ cat.category_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Widget -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">ℹ️ About</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Welcome to our Django blog! We share articles about technology, programming, and web development.</p>
+                </div>
+            </div>
+
+            <!-- Social Links Widget -->
+            {% if social_links %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">🌐 Follow Us</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap">
+                        {% for link in social_links %}
+                        <a href="{{ link.link }}" 
+                           target="_blank" 
+                           class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none"
+                           style="font-size: 0.9rem;">
+                            🔗 {{ link.platform }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 <!--footer path-->
-<footer class="blog-footer">
+<footer class="blog-footer mt-4">
   <center>
     <p>Django blog built with ❤️ by <a href="#">Sudharshan</a></p>
   </center>
 </footer>
-</body>
-</html>
 
 <!-- Bootstrap JS (Required for close buttons) -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
