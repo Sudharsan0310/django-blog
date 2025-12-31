@@ -22,22 +22,23 @@
         }
         
         /* Sidebar styling */
-        .sidebar .card {
+        .sidebar-widget .card {
             border: 1px solid #dee2e6;
             transition: transform 0.2s;
+            height: 100%;
         }
         
-        .sidebar .card:hover {
+        .sidebar-widget .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .sidebar a {
+        .sidebar-widget a {
             color: #495057;
             transition: color 0.2s;
         }
         
-        .sidebar a:hover {
+        .sidebar-widget a:hover {
             color: #ffc107;
             text-decoration: none;
         }
@@ -87,17 +88,15 @@
             </form>
           </div>
           <div class="col-4 d-flex justify-content-end align-items-center">
-    {% if user.is_authenticated %}
-      <a class="btn btn-sm btn-secondary mr-2" href="{% url 'categories_list' %}">Categories</a>
-      <a class="btn btn-sm btn-info mr-2" href="{% url 'dashboard' %}">Dashboard</a>
-      <span class="mr-2 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
-      <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
-    {% else %}
-      <a class="btn btn-sm btn-secondary mr-2" href="{% url 'categories_list' %}">Categories</a>
-      <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
-      <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
-    {% endif %}
-</div>
+            {% if user.is_authenticated %}
+              <a class="btn btn-sm btn-info mr-2" href="{% url 'dashboard' %}">Dashboard</a>
+              <span class="mr-2 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
+              <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+            {% else %}
+              <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
+              <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+            {% endif %}
+          </div>
         </div>
       </header>
 
@@ -111,69 +110,80 @@
         </nav>
       </div>
 
-<!--Main content with optional sidebar-->
+<!--Main content with widgets below-->
 {% block main_layout %}
+<!-- Main Content (Full Width) -->
 <div class="row">
-    <!-- Main Content -->
-    <div class="col-md-9">
+    <div class="col-md-12">
         {% block content %}
         {% endblock %}
     </div>
+</div>
 
-    <!-- Sidebar (Right side) -->
-    <div class="col-md-3">
-        <div class="sidebar">
-            
-            <!-- Categories Widget -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">📚 Categories</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap">
-                        {% for cat in categories %}
-                        <a href="{% url 'posts_by_category' cat.id %}" 
-                           class="badge badge-info mr-2 mb-2 p-2 text-decoration-none" 
-                           style="font-size: 0.9rem;">
-                            {{ cat.category_name }}
-                        </a>
-                        {% endfor %}
-                    </div>
+<!-- Widgets Row (3 boxes side by side) -->
+<div class="row mt-4 sidebar-widget">
+    <!-- Categories Widget -->
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📚 Categories</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap">
+                    {% for cat in categories %}
+                    <a href="{% url 'posts_by_category' cat.id %}" 
+                       class="badge badge-info mr-2 mb-2 p-2 text-decoration-none" 
+                       style="font-size: 0.9rem;">
+                        {{ cat.category_name }}
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
-
-            <!-- About Widget -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">ℹ️ About</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-0">Welcome to our Django blog! We share articles about technology, programming, and web development.</p>
-                </div>
-            </div>
-
-            <!-- Social Links Widget -->
-            {% if social_links %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🌐 Follow Us</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap">
-                        {% for link in social_links %}
-                        <a href="{{ link.link }}" 
-                           target="_blank" 
-                           class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none"
-                           style="font-size: 0.9rem;">
-                            🔗 {{ link.platform }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
         </div>
+    </div>
+
+    <!-- About Widget -->
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">ℹ️ About</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">Welcome to our Django blog! We share articles about technology, programming, and web development.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Links Widget -->
+    <div class="col-md-4">
+        {% if social_links %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🌐 Follow Us</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap">
+                    {% for link in social_links %}
+                    <a href="{{ link.link }}" 
+                       target="_blank" 
+                       class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none"
+                       style="font-size: 0.9rem;">
+                        🔗 {{ link.platform }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🌐 Follow Us</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">Connect with us on social media!</p>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

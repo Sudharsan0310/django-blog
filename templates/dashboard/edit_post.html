@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>✏️ Edit Blog Post</h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="{% url 'posts' %}" class="btn btn-secondary">
+                ← Back to Posts
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Edit Post Form -->
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Edit Post</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-8">
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label for="title">Post Title <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   name="title" 
+                                   id="title"
+                                   class="form-control" 
+                                   value="{{ post.title }}"
+                                   required>
+                            <small class="form-text text-muted">Current slug: {{ post.slug }}</small>
+                        </div>
+
+                        <!-- Short Description -->
+                        <div class="form-group">
+                            <label for="short_description">Short Description <span class="text-danger">*</span></label>
+                            <textarea name="short_description" 
+                                      id="short_description"
+                                      class="form-control" 
+                                      rows="3"
+                                      maxlength="500"
+                                      required>{{ post.short_description }}</textarea>
+                        </div>
+
+                        <!-- Blog Body -->
+                        <div class="form-group">
+                            <label for="blog_body">Blog Content <span class="text-danger">*</span></label>
+                            <textarea name="blog_body" 
+                                      id="blog_body"
+                                      class="form-control" 
+                                      rows="12"
+                                      required>{{ post.blog_body }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-4">
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="category">Category <span class="text-danger">*</span></label>
+                            <select name="category" 
+                                    id="category"
+                                    class="form-control" 
+                                    required>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if cat.id == post.category.id %}selected{% endif %}>
+                                    {{ cat.category_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Current Featured Image -->
+                        {% if post.feauture_image %}
+                        <div class="form-group">
+                            <label>Current Image:</label>
+                            <div>
+                                <img src="{{ post.feauture_image.url }}" 
+                                     alt="{{ post.title }}" 
+                                     class="img-fluid rounded"
+                                     style="max-width: 100%; height: auto;">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Featured Image Upload -->
+                        <div class="form-group">
+                            <label for="feature_image">
+                                {% if post.feauture_image %}
+                                    Change Featured Image
+                                {% else %}
+                                    Add Featured Image
+                                {% endif %}
+                            </label>
+                            <input type="file" 
+                                   name="feature_image" 
+                                   id="feature_image"
+                                   class="form-control-file"
+                                   accept="image/*">
+                            <small class="form-text text-muted">Leave empty to keep current image</small>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label for="status">Status <span class="text-danger">*</span></label>
+                            <select name="status" 
+                                    id="status"
+                                    class="form-control" 
+                                    required>
+                                <option value="Draft" {% if post.status == "Draft" %}selected{% endif %}>📝 Draft</option>
+                                <option value="Published" {% if post.status == "Published" %}selected{% endif %}>✅ Published</option>
+                            </select>
+                        </div>
+
+                        <!-- Featured Post -->
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" 
+                                       name="is_featured" 
+                                       class="custom-control-input" 
+                                       id="is_featured"
+                                       {% if post.is_featured %}checked{% endif %}>
+                                <label class="custom-control-label" for="is_featured">
+                                    ⭐ Mark as Featured Post
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Post Info -->
+                        <div class="alert alert-info mt-3">
+                            <strong>Author:</strong> {{ post.author.username }}<br>
+                            <strong>Created:</strong> {{ post.created_at|date:"M d, Y" }}<br>
+                            <strong>Updated:</strong> {{ post.updated_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <hr>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-warning btn-lg px-5">
+                        💾 Update Post
+                    </button>
+                    <a href="{% url 'posts' %}" class="btn btn-secondary btn-lg px-5">
+                        ❌ Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

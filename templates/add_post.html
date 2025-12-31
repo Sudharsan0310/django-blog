@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>✍️ Add New Blog Post</h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="{% url 'posts' %}" class="btn btn-secondary">
+                ← Back to Posts
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Add Post Form -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Create New Post</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-8">
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label for="title">Post Title <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   name="title" 
+                                   id="title"
+                                   class="form-control" 
+                                   placeholder="Enter post title"
+                                   required>
+                            <small class="form-text text-muted">A catchy title for your blog post</small>
+                        </div>
+
+                        <!-- Short Description -->
+                        <div class="form-group">
+                            <label for="short_description">Short Description <span class="text-danger">*</span></label>
+                            <textarea name="short_description" 
+                                      id="short_description"
+                                      class="form-control" 
+                                      rows="3"
+                                      placeholder="Enter a brief description (max 500 characters)"
+                                      maxlength="500"
+                                      required></textarea>
+                            <small class="form-text text-muted">This will appear on the blog listing page</small>
+                        </div>
+
+                        <!-- Blog Body -->
+                        <div class="form-group">
+                            <label for="blog_body">Blog Content <span class="text-danger">*</span></label>
+                            <textarea name="blog_body" 
+                                      id="blog_body"
+                                      class="form-control" 
+                                      rows="12"
+                                      placeholder="Write your blog content here..."
+                                      required></textarea>
+                            <small class="form-text text-muted">The main content of your blog post (max 2000 characters)</small>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-4">
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="category">Category <span class="text-danger">*</span></label>
+                            <select name="category" 
+                                    id="category"
+                                    class="form-control" 
+                                    required>
+                                <option value="">-- Select Category --</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Featured Image -->
+                        <div class="form-group">
+                            <label for="feature_image">Featured Image</label>
+                            <input type="file" 
+                                   name="feature_image" 
+                                   id="feature_image"
+                                   class="form-control-file"
+                                   accept="image/*">
+                            <small class="form-text text-muted">Upload a featured image for your post</small>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label for="status">Status <span class="text-danger">*</span></label>
+                            <select name="status" 
+                                    id="status"
+                                    class="form-control" 
+                                    required>
+                                <option value="Draft">📝 Draft</option>
+                                <option value="Published">✅ Published</option>
+                            </select>
+                            <small class="form-text text-muted">Draft posts won't be visible on the site</small>
+                        </div>
+
+                        <!-- Featured Post -->
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" 
+                                       name="is_featured" 
+                                       class="custom-control-input" 
+                                       id="is_featured">
+                                <label class="custom-control-label" for="is_featured">
+                                    ⭐ Mark as Featured Post
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Featured posts appear on the homepage</small>
+                        </div>
+
+                        <!-- Author Info -->
+                        <div class="alert alert-info mt-3">
+                            <strong>Author:</strong> {{ user.username }}<br>
+                            <strong>Date:</strong> {{ now|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <hr>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        ✅ Create Post
+                    </button>
+                    <a href="{% url 'posts' %}" class="btn btn-secondary btn-lg px-5">
+                        ❌ Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0">💡 Writing Tips</h6>
+        </div>
+        <div class="card-body">
+            <ul class="mb-0">
+                <li><strong>Title:</strong> Keep it clear, concise, and descriptive (50-60 characters)</li>
+                <li><strong>Description:</strong> Write a compelling summary that makes readers want to read more</li>
+                <li><strong>Content:</strong> Break up text with paragraphs, use simple language, and stay focused on your topic</li>
+                <li><strong>Image:</strong> Use high-quality images that are relevant to your content</li>
+                <li><strong>Category:</strong> Choose the most relevant category for better organization</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -3,23 +3,102 @@ from django.contrib.auth.decorators import login_required
 from blogs.models import Blog, Category
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.text import slugify
 
 @login_required(login_url='login')
 def dashboard(request):
     # Get user's blog posts
-    user_posts = Blog.objects.filter(author=request.user)
+    user_posts = Blog.objects.filter(author=request.user).order_by('-created_at')
     
     # Get all categories (only for admin/staff users)
     if request.user.is_staff or request.user.is_superuser:
         categories = Category.objects.all().order_by('-created_at')
+        all_posts = Blog.objects.all().order_by('-created_at')
     else:
         categories = None
+        all_posts = None
     
     context = {
         'user_posts': user_posts,
         'categories': categories,
+        'all_posts': all_posts,
     }
     return render(request, 'dashboard.html', context)
+
+@login_required(login_url='login')
+def posts(request):
+    # Get posts based on user role
+    if request.user.is_staff or request.user.is_superuser:
+        # Admin sees all posts
+        posts = Blog.objects.all().order_by('-created_at')
+    else:
+        # Regular users see only their posts
+        posts = Blog.objects.filter(author=request.user).order_by('-created_at')
+    
+    categories = Category.objects.all()
+    
+    context = {
+        'posts': posts,
+        'categories': categories,
+    }
+    return render(request, 'dashboard/post.html', context)
+
+@login_required(login_url='login')
+def add_post(request):
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        short_description = request.POST.get('short_description')
+        blog_body = request.POST.get('blog_body')
+        status = request.POST.get('status')
+        is_featured = request.POST.get('is_featured') == 'on'
+        feature_image = request.FILES.get('feature_image')
+        
+        # Validation
+        if not title or not category_id or not short_description or not blog_body:
+            messages.error(request, '❌ Please fill all required fields!')
+            return render(request, 'dashboard/add_post.html', {'categories': categories})
+        
+        try:
+            category = Category.objects.get(id=category_id)
+            
+            # Create slug from title
+            slug = slugify(title)
+            original_slug = slug
+            counter = 1
+            
+            # Make sure slug is unique
+            while Blog.objects.filter(slug=slug).exists():
+                slug = f"{original_slug}-{counter}"
+                counter += 1
+            
+            # Create the blog post
+            post = Blog.objects.create(
+                title=title,
+                slug=slug,
+                category=category,
+                author=request.user,
+                short_description=short_description,
+                blog_body=blog_body,
+                status=status,
+                is_featured=is_featured,
+                feauture_image=feature_image
+            )
+            
+            messages.success(request, f'✅ Post "{title}" created successfully!')
+            return redirect('posts')
+            
+        except Category.DoesNotExist:
+            messages.error(request, '❌ Invalid category selected!')
+        except Exception as e:
+            messages.error(request, f'❌ Error creating post: {str(e)}')
+    
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'dashboard/add_post.html', context)
 
 @login_required(login_url='login')
 def add_category(request):
@@ -47,6 +126,79 @@ def add_category(request):
             messages.error(request, 'Please enter a category name!')
     
     return redirect('dashboard')
+
+@login_required(login_url='login')
+def edit_post(request, post_id):
+    post = get_object_or_404(Blog, id=post_id)
+    
+    # Check if user has permission to edit
+    if not (request.user.is_staff or request.user.is_superuser or post.author == request.user):
+        messages.error(request, 'You do not have permission to edit this post!')
+        return redirect('posts')
+    
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        short_description = request.POST.get('short_description')
+        blog_body = request.POST.get('blog_body')
+        status = request.POST.get('status')
+        is_featured = request.POST.get('is_featured') == 'on'
+        feature_image = request.FILES.get('feature_image')
+        
+        # Validation
+        if not title or not category_id or not short_description or not blog_body:
+            messages.error(request, '❌ Please fill all required fields!')
+            return render(request, 'dashboard/edit_post.html', {
+                'post': post,
+                'categories': categories
+            })
+        
+        try:
+            category = Category.objects.get(id=category_id)
+            
+            # Update slug only if title changed
+            if post.title != title:
+                slug = slugify(title)
+                original_slug = slug
+                counter = 1
+                
+                # Make sure slug is unique (exclude current post)
+                while Blog.objects.filter(slug=slug).exclude(id=post_id).exists():
+                    slug = f"{original_slug}-{counter}"
+                    counter += 1
+                
+                post.slug = slug
+            
+            # Update post fields
+            post.title = title
+            post.category = category
+            post.short_description = short_description
+            post.blog_body = blog_body
+            post.status = status
+            post.is_featured = is_featured
+            
+            # Update image only if new one is uploaded
+            if feature_image:
+                post.feauture_image = feature_image
+            
+            post.updated_at = timezone.now()
+            post.save()
+            
+            messages.success(request, f'✅ Post "{title}" updated successfully!')
+            return redirect('posts')
+            
+        except Category.DoesNotExist:
+            messages.error(request, '❌ Invalid category selected!')
+        except Exception as e:
+            messages.error(request, f'❌ Error updating post: {str(e)}')
+    
+    context = {
+        'post': post,
+        'categories': categories,
+    }
+    return render(request, 'dashboard/edit_post.html', context)
 
 @login_required(login_url='login')
 def edit_category(request, category_id):
@@ -95,3 +247,36 @@ def delete_category(request, category_id):
         messages.success(request, f'✅ Category "{category_name}" deleted successfully!')
     
     return redirect('dashboard')
+
+@login_required(login_url='login')
+def delete_post(request, post_id):
+    post = get_object_or_404(Blog, id=post_id)
+    
+    # Check if user has permission
+    if not (request.user.is_staff or request.user.is_superuser or post.author == request.user):
+        messages.error(request, 'You do not have permission to delete this post!')
+        return redirect('dashboard')
+    
+    post_title = post.title
+    post.delete()
+    messages.success(request, f'✅ Post "{post_title}" deleted successfully!')
+    
+    return redirect('posts')
+
+@login_required(login_url='login')
+def toggle_featured(request, post_id):
+    # Only admin/staff can toggle featured
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, 'You do not have permission to feature posts!')
+        return redirect('dashboard')
+    
+    post = get_object_or_404(Blog, id=post_id)
+    post.is_featured = not post.is_featured
+    post.save()
+    
+    if post.is_featured:
+        messages.success(request, f'⭐ Post "{post.title}" is now featured!')
+    else:
+        messages.success(request, f'Post "{post.title}" removed from featured!')
+    
+    return redirect('posts')
