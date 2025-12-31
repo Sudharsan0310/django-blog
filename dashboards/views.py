@@ -4,6 +4,9 @@ from blogs.models import Blog, Category
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.text import slugify
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import user_passes_test
+
 
 @login_required(login_url='login')
 def dashboard(request):
@@ -280,3 +283,135 @@ def toggle_featured(request, post_id):
         messages.success(request, f'Post "{post.title}" removed from featured!')
     
     return redirect('posts')
+
+
+# Check if user is manager (superuser)
+def is_manager(user):
+    return user.is_superuser
+
+@login_required(login_url='login')
+@user_passes_test(is_manager)
+def users_list(request):
+    """View all users - Only for superuser"""
+    users = User.objects.all().order_by('-date_joined')
+    
+    context = {
+        'users': users,
+    }
+    return render(request, 'dashboard/users.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_manager)
+def add_user(request):
+    """Add new user - Only for superuser"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        is_staff = request.POST.get('is_staff') == 'on'
+        is_superuser = request.POST.get('is_superuser') == 'on'
+        
+        # Validation
+        if not username or not email or not password:
+            messages.error(request, '❌ Please fill all required fields!')
+            return redirect('users_list')
+        
+        if password != password2:
+            messages.error(request, '❌ Passwords do not match!')
+            return redirect('users_list')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, f'❌ Username "{username}" already exists!')
+            return redirect('users_list')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, f'❌ Email "{email}" already registered!')
+            return redirect('users_list')
+        
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=is_staff,
+                is_superuser=is_superuser
+            )
+            messages.success(request, f'✅ User "{username}" created successfully!')
+        except Exception as e:
+            messages.error(request, f'❌ Error creating user: {str(e)}')
+    
+    return redirect('users_list')
+
+@login_required(login_url='login')
+@user_passes_test(is_manager)
+def edit_user(request, user_id):
+    """Edit user - Only for superuser"""
+    user_to_edit = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        is_staff = request.POST.get('is_staff') == 'on'
+        is_superuser = request.POST.get('is_superuser') == 'on'
+        is_active = request.POST.get('is_active') == 'on'
+        new_password = request.POST.get('new_password')
+        
+        # Check if username already exists (exclude current user)
+        if User.objects.filter(username=username).exclude(id=user_id).exists():
+            messages.error(request, f'❌ Username "{username}" already exists!')
+            return redirect('users_list')
+        
+        # Check if email already exists (exclude current user)
+        if User.objects.filter(email=email).exclude(id=user_id).exists():
+            messages.error(request, f'❌ Email "{email}" already registered!')
+            return redirect('users_list')
+        
+        try:
+            user_to_edit.username = username
+            user_to_edit.email = email
+            user_to_edit.first_name = first_name
+            user_to_edit.last_name = last_name
+            user_to_edit.is_staff = is_staff
+            user_to_edit.is_superuser = is_superuser
+            user_to_edit.is_active = is_active
+            
+            # Update password if provided
+            if new_password:
+                user_to_edit.set_password(new_password)
+            
+            user_to_edit.save()
+            messages.success(request, f'✅ User "{username}" updated successfully!')
+        except Exception as e:
+            messages.error(request, f'❌ Error updating user: {str(e)}')
+    
+    return redirect('users_list')
+
+@login_required(login_url='login')
+@user_passes_test(is_manager)
+def delete_user(request, user_id):
+    """Delete user - Only for superuser"""
+    user_to_delete = get_object_or_404(User, id=user_id)
+    
+    # Prevent deleting yourself
+    if user_to_delete == request.user:
+        messages.error(request, '❌ You cannot delete yourself!')
+        return redirect('users_list')
+    
+    # Check if user has posts
+    post_count = Blog.objects.filter(author=user_to_delete).count()
+    
+    if post_count > 0:
+        messages.warning(request, f'⚠️ User "{user_to_delete.username}" has {post_count} blog post(s). Please reassign or delete posts first!')
+    else:
+        username = user_to_delete.username
+        user_to_delete.delete()
+        messages.success(request, f'✅ User "{username}" deleted successfully!')
+    
+    return redirect('users_list')

@@ -11,4 +11,10 @@ urlpatterns = [
     path('delete-category/<int:category_id>/', views.delete_category, name='delete_category'),
     path('delete-post/<int:post_id>/', views.delete_post, name='delete_post'),
     path('toggle-featured/<int:post_id>/', views.toggle_featured, name='toggle_featured'),
+    
+    # User Management (Manager only)
+    path('users/', views.users_list, name='users_list'),
+    path('add-user/', views.add_user, name='add_user'),
+    path('edit-user/<int:user_id>/', views.edit_user, name='edit_user'),
+    path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
 ]

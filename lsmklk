@@ -1,0 +1,41 @@
+[33mcommit ed6b181fb6731219cea868445c90bb33516b0ba1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Wed Dec 31 12:05:24 2025 +0530
+
+    posts crud operations
+
+[33mcommit 63083a534b247d3123db542235baad03f892778b[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Tue Dec 30 15:42:19 2025 +0530
+
+    category crud functionality
+
+[33mcommit 9a3893ccf20848a2e1c81d36acc764ec61323714[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Tue Dec 30 10:00:42 2025 +0530
+
+    Registration and login functionality
+
+[33mcommit 94a79d8068950f5452ef522bab423e336b0f0cc0[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Mon Dec 29 22:31:25 2025 +0530
+
+    blogs and search feature
+
+[33mcommit 4f6bdf0c2f5e6d997c2a0ba37601fe2c27e06747[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Sun Dec 28 20:36:06 2025 +0530
+
+    posts by category
+
+[33mcommit 56258e41e091d9251c4e57ff4e9ecfd80e7d8e88[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Sat Dec 27 15:21:03 2025 +0530
+
+    blogs app and blog model
+
+[33mcommit 92fdf498953ef558589213a8c601c890ca2167bc[m
+Author: Sudharsan <jssudharsan7@gmail.com>
+Date:   Sat Dec 27 08:03:30 2025 +0530
+
+    initiailzed django blog and created home page

@@ -280,21 +280,30 @@
                 <h5>Quick Actions</h5>
             </div>
             <div class="card-body text-center">
-                <a href="{% url 'add_post' %}" class="btn btn-success mr-2">
-                    ➕ Add New Post
-                </a>
-                <a href="{% url 'posts' %}" class="btn btn-info mr-2">
-                    📰 View All Posts
-                </a>
-                <a href="{% url 'home' %}" class="btn btn-primary mr-2">
-                    🏠 Go to Homepage
-                </a>
-                <a href="{% url 'logout' %}" class="btn btn-danger">
-                    🚪 Logout
-                </a>
+                <div class="d-flex justify-content-center flex-wrap">
+                    <a href="{% url 'add_post' %}" class="btn btn-success m-2">
+                        ➕ Add New Post
+                    </a>
+                    <a href="{% url 'posts' %}" class="btn btn-info m-2">
+                        📰 View All Posts
+                    </a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'users_list' %}" class="btn btn-danger m-2">
+                        👥 Manage Users
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'home' %}" class="btn btn-primary m-2">
+                        🏠 Go to Homepage
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary m-2">
+                        🚪 Logout
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+</div> <!-- Close container -->
 
 {% endblock %}
