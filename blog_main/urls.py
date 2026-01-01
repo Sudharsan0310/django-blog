@@ -42,6 +42,9 @@ urlpatterns = [
     path('logout/', main_views.user_logout, name='logout'),
     path('dashboard/', include('dashboards.urls')),
     
+    # Comments
+    path('delete-comment/<int:comment_id>/', blog_views.delete_comment, name='delete_comment'),
+    
     # Slug pattern LAST
     path('<slug:slug>/', blog_views.blogs, name='blogs'),
 ]

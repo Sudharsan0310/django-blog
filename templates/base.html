@@ -46,6 +46,7 @@
         /* Category navigation */
         .nav-scroller {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .nav-scroller .nav {
@@ -70,31 +71,178 @@
             transform: scale(1.05);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+        
+        /* ========== MOBILE RESPONSIVE STYLES ========== */
+        
+        /*Mobile devices (phones, less than 768px) */
+        @media (max-width: 767.98px) {
+            /* Header adjustments */
+            .blog-header-logo {
+                font-size: 1.2rem !important;
+            }
+            
+            /* Make buttons smaller on mobile */
+            .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            /* Stack header items vertically on small screens */
+            .blog-header .row {
+                flex-direction: column;
+            }
+            
+            .blog-header .col-4 {
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 10px;
+                text-align: center !important;
+                justify-content: center !important;
+            }
+            
+            /* Hide username on mobile to save space */
+            .blog-header span {
+                display: none;
+            }
+            
+            /* Search bar full width on mobile */
+            .blog-header .input-group {
+                width: 100%;
+            }
+            
+            /* Category navigation scrollable */
+            .nav-scroller .nav {
+                overflow-x: scroll;
+                white-space: nowrap;
+            }
+            
+            /* Widgets stack vertically on mobile */
+            .sidebar-widget .col-md-4 {
+                margin-bottom: 15px;
+            }
+            
+            /* Tables responsive */
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+            
+            /* Images responsive */
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            /* Card spacing */
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            /* Comment section */
+            .media {
+                padding: 1rem !important;
+            }
+            
+            /* Quick actions buttons wrap */
+            .d-flex.flex-wrap {
+                justify-content: center !important;
+            }
+            
+            .d-flex.flex-wrap .btn {
+                margin: 5px !important;
+                font-size: 0.85rem;
+            }
+            
+            /* Featured image height adjustment */
+            .jumbotron {
+                min-height: 250px !important;
+                padding: 1.5rem !important;
+            }
+            
+            /* Dashboard cards */
+            .card-body h3 {
+                font-size: 1.5rem;
+            }
+            
+            /* Modal adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            /* Footer text size */
+            .blog-footer {
+                font-size: 0.9rem;
+                text-align: center;
+            }
+            
+            /* Container padding on mobile */
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+        
+        /* Tablets (768px to 991.98px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .blog-header-logo {
+                font-size: 1.5rem;
+            }
+            
+            /* Sidebar widgets 2 per row on tablets */
+            .sidebar-widget .col-md-4 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+        
+        /* Large tablets and small desktops (992px to 1199.98px) */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+        
+        /* Extra large screens (1200px and up) */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
       <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
-          <div class="col-4 pt-1">
-            <a class="blog-header-logo text-dark" href="{% url 'home' %}">Django Blog</a>
+          <!-- Logo -->
+          <div class="col-12 col-md-4 pt-1 text-center text-md-left">
+            <a class="blog-header-logo text-dark h4 mb-0" href="{% url 'home' %}">
+                Django Blog
+            </a>
           </div>
-          <div class="col-4">
+          
+          <!-- Search Bar -->
+          <div class="col-12 col-md-4 mt-2 mt-md-0">
             <form action="{% url 'search' %}" method="GET">
-              <div class="input-group">
-                <input class="form-control" type="text" name="keyword" placeholder="Enter search term..." />
+              <div class="input-group input-group-sm">
+                <input class="form-control" type="text" name="keyword" placeholder="Search..." />
                 <button class="btn btn-warning" type="submit">Go!</button>
               </div>
             </form>
           </div>
-          <div class="col-4 d-flex justify-content-end align-items-center">
+          
+          <!-- Auth Buttons -->
+          <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end align-items-center mt-2 mt-md-0 flex-wrap">
             {% if user.is_authenticated %}
-              <a class="btn btn-sm btn-info mr-2" href="{% url 'dashboard' %}">Dashboard</a>
-              <span class="mr-2 text-dark">Hello, <strong>{{ user.username }}</strong>!</span>
-              <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+              <a class="btn btn-sm btn-info m-1" href="{% url 'dashboard' %}">Dashboard</a>
+              <span class="mr-2 text-dark d-none d-lg-inline">Hello, <strong>{{ user.username }}</strong>!</span>
+              <a class="btn btn-sm btn-outline-danger m-1" href="{% url 'logout' %}">Logout</a>
             {% else %}
-              <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
-              <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+              <a class="btn btn-sm btn-warning m-1" href="{% url 'login' %}">Login</a>
+              <a class="btn btn-sm btn-outline-secondary m-1" href="{% url 'register' %}">Register</a>
             {% endif %}
           </div>
         </div>
@@ -120,11 +268,11 @@
     </div>
 </div>
 
-<!-- Widgets Row (3 boxes side by side) -->
+<!-- Widgets Row (3 boxes side by side, responsive) -->
 <div class="row mt-4 sidebar-widget">
     <!-- Categories Widget -->
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
+    <div class="col-12 col-sm-6 col-md-4 mb-3">
+        <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">📚 Categories</h5>
             </div>
@@ -143,8 +291,8 @@
     </div>
 
     <!-- About Widget -->
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
+    <div class="col-12 col-sm-6 col-md-4 mb-3">
+        <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">ℹ️ About</h5>
             </div>
@@ -155,56 +303,45 @@
     </div>
 
     <!-- Social Links Widget -->
-    <div class="col-md-4">
-        {% if social_links %}
-        <div class="card mb-4 shadow-sm">
+    <div class="col-12 col-sm-12 col-md-4 mb-3">
+        <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">🌐 Follow Us</h5>
             </div>
             <div class="card-body">
-                <div class="d-flex flex-wrap">
-                    {% for link in social_links %}
-                    <a href="{{ link.link }}" 
-                       target="_blank" 
-                       class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none"
-                       style="font-size: 0.9rem;">
-                        🔗 {{ link.platform }}
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start">
+                    <a href="#" target="_blank" class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none" style="font-size: 0.9rem;">
+                        🔗 GitHub
                     </a>
-                    {% endfor %}
+                    <a href="#" target="_blank" class="badge badge-primary mr-2 mb-2 p-2 text-decoration-none" style="font-size: 0.9rem;">
+                        🔗 LinkedIn
+                    </a>
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">🌐 Follow Us</h5>
-            </div>
-            <div class="card-body">
-                <p class="mb-0">Connect with us on social media!</p>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
 
 <!--footer path-->
-<footer class="blog-footer mt-4">
+<footer class="blog-footer mt-4 py-3">
   <center>
-    <p>Django blog built with ❤️ by <a href="#">Sudharshan</a></p>
+    <p class="mb-0">Django blog built with ❤️ by <a href="#">Sudharshan</a></p>
   </center>
 </footer>
 
 <!-- Bootstrap JS (Required for close buttons) -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <!-- Auto-hide alerts after 3 seconds -->
 <script>
-  setTimeout(function() {
-    $('.alert').fadeOut('slow');
-  }, 3000);
+  $(document).ready(function() {
+    setTimeout(function() {
+      $('.alert').fadeOut('slow');
+    }, 3000);
+  });
 </script>
 
 </body>

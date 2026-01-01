@@ -64,7 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'blogs.context_processors.get_social_links',  # ✅ Only one "get"
+                'blogs.context_processors.get_social_links',  
             ],
         },
     },

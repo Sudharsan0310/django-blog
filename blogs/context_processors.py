@@ -9,4 +9,4 @@ def get_categories(request):
 
 def get_social_links(request):
     social_links = SocialLink.objects.all()
-    return {'social_links': social_links}  # ✅ Correct
+    return {'social_links': social_links} 
