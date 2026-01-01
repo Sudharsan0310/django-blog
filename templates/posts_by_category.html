@@ -1,35 +1,78 @@
 {% extends 'base.html' %}
 
-       {% block content %}
-  
+{% block content %}
 
-        <h2 class="my-4">{{ category.category_name }}</h2>
-
-        <div class="row">
-            {% for post in posts %}
-            <div class="col-md-12 mb-4">
-                <div class="card border-0">
-                    <div class="card-body">
-                        <h3><a href="{% url 'blogs' post.slug %}" class="text-dark">{{ post.title }}</a></h3>
-                        <small class="mb-1 text-muted">{{ post.created_at|timesince }} ago | {{ post.author }}</small>
-                        <p class="card-text">{{ post.short_description }}</p>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-md-12">
-                <div class="alert alert-info" role="alert">
-                    <h4 class="alert-heading">No posts found!</h4>
-                    <p>There are currently no posts in the <strong>{{ category.category_name }}</strong> category.</p>
-                    <hr>
-                    <p class="mb-0">Check back later or explore other categories!</p>
-                </div>
-            </div>
-            {% endfor %}
+<div class="container mt-4">
+    <!-- Category Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">{{ category.category_name }}</h1>
+            <hr>
         </div>
-
-        <a href="{% url 'home' %}" class="btn btn-primary mb-4">← Back to Home</a>
     </div>
 
+    <!-- Blog Posts -->
+    {% if posts %}
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if post.feauture_image %}
+                <img src="{{ post.feauture_image.url }}" 
+                     class="card-img-top" 
+                     alt="{{ post.title }}"
+                     style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div style="height: 200px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                    <span class="text-muted">No Image</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'blogs' post.slug %}" class="text-dark">
+                            {{ post.title }}
+                        </a>
+                    </h5>
+                    <p class="card-text">{{ post.short_description|truncatewords:20 }}</p>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <strong>By:</strong> {{ post.author.username }} | 
+                            <strong>Date:</strong> {{ post.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                    {% if post.is_featured %}
+                    <span class="badge badge-warning">⭐ Featured</span>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'blogs' post.slug %}" class="btn btn-primary btn-sm btn-block">
+                        Read More →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info" style="padding: 2rem;">
+                <h4>📝 No posts in this category yet!</h4>
+                <p>There are currently no published posts in the "{{ category.category_name }}" category.</p>
+                <a href="{% url 'home' %}" class="btn btn-primary mt-2">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="row mt-4 mb-5">
+        <div class="col-md-12">
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                ← Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
-    
